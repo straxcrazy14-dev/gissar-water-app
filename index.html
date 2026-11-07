@@ -1,0 +1,272 @@
+<!doctype html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light">
+<title>Gissar Water</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<style>
+:root{
+  --navy:#0B3C8C; --navy-d:#061F4A; --blue:#1E90FF; --sky:#8FE3FF;
+  --bg:#F1F7FF; --card:#FFFFFF; --ink:#0D2447; --muted:#5B7094; --line:#E1ECFA; --err:#D93A3A;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html{color-scheme:light}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  background:var(--bg);color:var(--ink);
+  padding-bottom:calc(104px + env(safe-area-inset-bottom));
+}
+header{
+  background:linear-gradient(160deg,var(--navy) 0%,var(--navy-d) 100%);
+  color:#fff;padding:calc(20px + env(safe-area-inset-top)) 18px 52px;
+}
+.brand{display:flex;align-items:center;gap:12px}
+.brand h1{font-size:22px;letter-spacing:.3px;font-weight:800}
+.brand p{font-size:13px;color:var(--sky);margin-top:2px}
+main{margin-top:-30px;padding:0 14px}
+.title{font-size:13px;font-weight:700;color:var(--sky);text-transform:uppercase;letter-spacing:.8px;margin:0 4px 14px}
+.card{
+  background:var(--card);border-radius:18px;padding:12px 14px;margin-bottom:10px;
+  display:grid;grid-template-columns:64px 1fr auto;align-items:center;gap:12px;
+  box-shadow:0 2px 10px rgba(11,60,140,.08);border:1px solid var(--line);
+}
+.pic{width:64px;height:84px;display:flex;align-items:flex-end;justify-content:center}
+.name{font-size:17px;font-weight:700}
+.price{font-size:14px;color:var(--muted);margin-top:3px}
+.add{
+  width:42px;height:42px;border-radius:50%;border:0;background:var(--blue);color:#fff;
+  font-size:26px;line-height:1;font-weight:600;cursor:pointer;
+}
+.step{display:flex;align-items:center;gap:2px;background:#EAF3FF;border-radius:22px;padding:3px}
+.step button{
+  width:36px;height:36px;border-radius:50%;border:0;background:#fff;color:var(--navy);
+  font-size:22px;font-weight:700;line-height:1;cursor:pointer;box-shadow:0 1px 3px rgba(11,60,140,.15);
+}
+.step span{min-width:30px;text-align:center;font-weight:800;font-size:16px}
+.add:active,.step button:active{transform:scale(.92)}
+#bar{
+  position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid var(--line);
+  padding:12px 14px calc(12px + env(safe-area-inset-bottom));
+  display:flex;align-items:center;gap:12px;transform:translateY(115%);transition:transform .25s ease;z-index:5;
+}
+#bar.show{transform:none}
+#bar .sum{flex:1;min-width:0}
+#bar .sum small{display:block;font-size:12px;color:var(--muted)}
+#bar .sum b{font-size:19px}
+.btn{
+  border:0;border-radius:14px;padding:14px 20px;font-size:16px;font-weight:700;color:#fff;cursor:pointer;
+  background:linear-gradient(135deg,var(--blue),var(--navy));
+}
+.btn:active{opacity:.85}
+.btn[disabled]{opacity:.55}
+.btn.ghost{background:#EAF3FF;color:var(--navy);width:100%;margin-top:8px}
+.sheet{position:fixed;inset:0;z-index:10;display:none}
+.sheet.open{display:block}
+.sheet .bg{position:absolute;inset:0;background:rgba(6,31,74,.5)}
+.panel{
+  position:absolute;left:0;right:0;bottom:0;background:#fff;border-radius:22px 22px 0 0;
+  padding:18px 16px calc(18px + env(safe-area-inset-bottom));max-height:92vh;overflow:auto;
+}
+.panel h2{font-size:20px;margin-bottom:10px}
+.lines{list-style:none;margin-bottom:6px}
+.lines li{display:flex;justify-content:space-between;gap:10px;padding:9px 0;border-bottom:1px solid var(--line);font-size:15px}
+.lines li span:last-child{font-weight:700;white-space:nowrap}
+.total{display:flex;justify-content:space-between;font-size:18px;padding:12px 0 14px}
+label{display:block;font-size:13px;font-weight:700;color:var(--muted);margin-bottom:6px}
+textarea{
+  width:100%;border:1.5px solid var(--line);border-radius:12px;padding:12px;font:inherit;font-size:16px;
+  color:var(--ink);resize:none;background:#F8FBFF;outline:none;
+}
+textarea:focus{border-color:var(--blue)}
+#err{color:var(--err);font-size:14px;min-height:20px;margin:8px 0 10px}
+#send{width:100%}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <linearGradient id="gw" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#8FE3FF"/><stop offset="1" stop-color="#1E90FF"/>
+    </linearGradient>
+  </defs>
+</svg>
+
+<header>
+  <div class="brand">
+    <svg viewBox="0 0 48 48" width="48" height="48" aria-hidden="true">
+      <circle cx="24" cy="24" r="23" fill="#0B3C8C" stroke="#7FDBFF" stroke-opacity=".6" stroke-width="1.5"/>
+      <path d="M24 8 C24 8 14 20 14 27 a10 10 0 0 0 20 0 C34 20 24 8 24 8 Z" fill="url(#gw)"/>
+      <path d="M19 25 C19 22 21 19 23 17" stroke="#fff" stroke-width="1.6" stroke-linecap="round" fill="none" opacity=".7"/>
+    </svg>
+    <div>
+      <h1>Gissar Water</h1>
+      <p>Toza suv — tez yetkazib berish</p>
+    </div>
+  </div>
+</header>
+
+<main>
+  <div class="title">Suvni tanlang</div>
+  <div id="list"></div>
+</main>
+
+<div id="bar">
+  <div class="sum"><small id="cnt">0 ta</small><b id="tot">0 so'm</b></div>
+  <button class="btn" id="open">Savatni ko'rish</button>
+</div>
+
+<div class="sheet" id="sheet">
+  <div class="bg" id="sheetbg"></div>
+  <div class="panel" role="dialog" aria-label="Buyurtma">
+    <h2>Buyurtmangiz</h2>
+    <ul class="lines" id="lines"></ul>
+    <div class="total"><span>Jami</span><b id="sum"></b></div>
+    <label for="addr">Yetkazib berish manzili</label>
+    <textarea id="addr" rows="3" maxlength="300" placeholder="Tuman, ko'cha, uy, mo'ljal"></textarea>
+    <div id="err" role="alert"></div>
+    <button class="btn" id="send">Buyurtmani yuborish</button>
+    <button class="btn ghost" id="back">Orqaga</button>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+  var tg = window.Telegram && window.Telegram.WebApp;
+  try {
+    if (tg) { tg.ready(); tg.expand(); tg.setHeaderColor('#0B3C8C'); tg.setBackgroundColor('#F1F7FF'); }
+  } catch (e) {}
+
+  // Bot narxlarni havola ichida yuboradi: ?p=<base64 JSON [[id, nom, narx], ...]>
+  var DEMO = [[1, '0.5 litr', 2000], [2, '1 litr', 3000], [3, '5 litr', 9000], [4, '10 litr', 15000], [5, '19 litr', 22000]];
+
+  function fmt(n) { return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ' '); }
+  function esc(s) {
+    return String(s).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+  function $(id) { return document.getElementById(id); }
+
+  function load() {
+    try {
+      var raw = new URLSearchParams(location.search).get('p');
+      if (!raw) throw 0;
+      var b = raw.replace(/-/g, '+').replace(/_/g, '/');
+      while (b.length % 4) b += '=';
+      var bin = atob(b);
+      var bytes = new Uint8Array(bin.length);
+      for (var i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+      var arr = JSON.parse(new TextDecoder().decode(bytes));
+      if (!Array.isArray(arr) || !arr.length) throw 0;
+      return arr;
+    } catch (e) { return DEMO; }
+  }
+
+  var products = load().map(function (r) { return { id: Number(r[0]), name: String(r[1]), price: Number(r[2]) }; });
+  var qty = {};
+  var MAX = 99;
+
+  function haptic() {
+    try { if (tg && tg.HapticFeedback) tg.HapticFeedback.impactOccurred('light'); } catch (e) {}
+  }
+
+  function pic(name) {
+    var m = name.match(/[\d.]+/);
+    var v = m ? parseFloat(m[0]) : 1;
+    if (v < 5) {
+      var h = Math.round(54 + v * 3);
+      return '<svg viewBox="0 0 40 84" height="' + h + '" aria-hidden="true">' +
+        '<rect x="14" y="2" width="12" height="9" rx="2.5" fill="#0B3C8C"/>' +
+        '<path d="M14 11h12v8c0 6 11 8 11 21v34a7 7 0 0 1-7 7H10a7 7 0 0 1-7-7V40c0-13 11-15 11-21z" fill="url(#gw)"/>' +
+        '<path d="M10 42c0-6 3-9 5-12" stroke="#fff" stroke-width="2.4" stroke-linecap="round" fill="none" opacity=".65"/>' +
+        '<rect x="6" y="52" width="28" height="14" rx="3" fill="#fff" opacity=".85"/>' +
+        '<path d="M20 55c-2.4 3-3.4 4.4-3.4 6a3.4 3.4 0 0 0 6.8 0c0-1.6-1-3-3.4-6z" fill="#1E90FF"/></svg>';
+    }
+    var h2 = Math.round(62 + Math.min(v, 19) * 0.85);
+    return '<svg viewBox="0 0 64 84" height="' + h2 + '" aria-hidden="true">' +
+      '<rect x="22" y="2" width="20" height="9" rx="3" fill="#0B3C8C"/>' +
+      '<path d="M54 40c9 0 9 18 0 18" stroke="#1E90FF" stroke-width="4" fill="none" stroke-linecap="round"/>' +
+      '<path d="M22 11h20v7c0 5 14 8 14 20v38a7 7 0 0 1-7 7H15a7 7 0 0 1-7-7V38c0-12 14-15 14-20z" fill="url(#gw)"/>' +
+      '<path d="M15 42c0-6 3-9 6-12" stroke="#fff" stroke-width="2.6" stroke-linecap="round" fill="none" opacity=".65"/>' +
+      '<rect x="14" y="50" width="36" height="16" rx="3" fill="#fff" opacity=".85"/>' +
+      '<path d="M32 53c-2.6 3.2-3.6 4.8-3.6 6.4a3.6 3.6 0 0 0 7.2 0c0-1.6-1-3.2-3.6-6.4z" fill="#1E90FF"/></svg>';
+  }
+
+  function totals() {
+    var n = 0, s = 0;
+    products.forEach(function (p) { var k = qty[p.id] || 0; n += k; s += k * p.price; });
+    return { n: n, s: s };
+  }
+
+  function render() {
+    $('list').innerHTML = products.map(function (p) {
+      var k = qty[p.id] || 0;
+      var ctl = k
+        ? '<div class="step"><button data-act="dec" data-id="' + p.id + '" aria-label="Kamaytirish">−</button><span>' + k +
+          '</span><button data-act="inc" data-id="' + p.id + '" aria-label="Ko\'paytirish">+</button></div>'
+        : '<button class="add" data-act="inc" data-id="' + p.id + '" aria-label="Qo\'shish">+</button>';
+      return '<div class="card"><div class="pic">' + pic(p.name) + '</div>' +
+        '<div><div class="name">' + esc(p.name) + '</div><div class="price">' + fmt(p.price) + " so'm</div></div>" +
+        ctl + '</div>';
+    }).join('');
+    var t = totals();
+    $('cnt').textContent = t.n + ' ta';
+    $('tot').textContent = fmt(t.s) + " so'm";
+    $('bar').classList.toggle('show', t.n > 0);
+  }
+
+  $('list').addEventListener('click', function (e) {
+    var b = e.target.closest('button[data-act]');
+    if (!b) return;
+    var id = Number(b.getAttribute('data-id'));
+    var k = qty[id] || 0;
+    if (b.getAttribute('data-act') === 'inc') k = Math.min(MAX, k + 1); else k = Math.max(0, k - 1);
+    if (k) qty[id] = k; else delete qty[id];
+    haptic();
+    render();
+  });
+
+  function openSheet() {
+    var t = totals();
+    if (!t.n) return;
+    $('lines').innerHTML = products.filter(function (p) { return qty[p.id]; }).map(function (p) {
+      return '<li><span>' + esc(p.name) + ' × ' + qty[p.id] + '</span><span>' + fmt(p.price * qty[p.id]) + " so'm</span></li>";
+    }).join('');
+    $('sum').textContent = fmt(t.s) + " so'm";
+    $('err').textContent = '';
+    try { var a = localStorage.getItem('gw_addr'); if (a && !$('addr').value) $('addr').value = a; } catch (e) {}
+    $('sheet').classList.add('open');
+  }
+  function closeSheet() { $('sheet').classList.remove('open'); }
+
+  $('open').addEventListener('click', openSheet);
+  $('back').addEventListener('click', closeSheet);
+  $('sheetbg').addEventListener('click', closeSheet);
+
+  $('send').addEventListener('click', function () {
+    var addr = $('addr').value.trim();
+    if (addr.length < 5) { $('err').textContent = "Iltimos, yetkazib berish manzilini yozing."; return; }
+    var items = products.filter(function (p) { return qty[p.id]; }).map(function (p) { return [p.id, qty[p.id]]; });
+    if (!items.length) { closeSheet(); return; }
+    if (!tg || !tg.initData) {
+      $('err').textContent = "Bu sahifa Telegram bot ichida ochilganda ishlaydi.";
+      return;
+    }
+    try { localStorage.setItem('gw_addr', addr); } catch (e) {}
+    $('send').disabled = true;
+    try {
+      tg.sendData(JSON.stringify({ v: 1, items: items, address: addr }));
+    } catch (e) {
+      $('send').disabled = false;
+      $('err').textContent = "Yuborib bo'lmadi. Ilovani bot menyusidagi tugma orqali oching.";
+    }
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>
